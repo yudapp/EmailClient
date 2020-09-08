@@ -10,6 +10,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class LoginWindowController extends BaseController {
 
     public LoginWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
@@ -27,6 +29,7 @@ public class LoginWindowController extends BaseController {
 
     @FXML
     void loginButtonAction() {
+        System.out.println("Login BUTON CLICKED");
         //check first if email and password fields are not empty
         if(fieldsAreValid()) {
             EmailAccount emailAccount = new EmailAccount(emailAddressField.getText(), passwordField.getText());
@@ -37,17 +40,17 @@ public class LoginWindowController extends BaseController {
                     System.out.println("Login success "+ emailAccount);
                     return;
             }
-            System.out.println("login");
-            viewFactory.showMainWindow();
-
-            //get the window of the login stage and call the close method on it.
-            Stage stage = (Stage) errorLabel.getScene().getWindow();
-            viewFactory.closeStage(stage);
+//            System.out.println("login");
+//            viewFactory.showMainWindow();
+//
+//            //get the window of the login stage and call the close method on it.
+//            Stage stage = (Stage) errorLabel.getScene().getWindow();
+//            viewFactory.closeStage(stage);
         }
     }
 
     private boolean fieldsAreValid() {
-        if(emailAddressField.getText().isEmpty()){
+         if(emailAddressField.getText().isEmpty()){
             errorLabel.setText("Please fill email");
             return false;
         }
