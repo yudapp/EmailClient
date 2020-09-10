@@ -3,10 +3,12 @@ package com.mainemail.controller.services;
 import com.mainemail.EmailManager;
 import com.mainemail.controller.EmailLoginResult;
 import com.mainemail.model.EmailAccount;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 
 import javax.mail.*;
 
-public class LoginService {
+public class LoginService extends Service<EmailLoginResult> {
 
     EmailAccount emailAccount;
     EmailManager emailManager;
@@ -16,35 +18,46 @@ public class LoginService {
         this.emailManager = emailManager;
     }
 
-    public EmailLoginResult login(){
+    private EmailLoginResult login() {
 
-        Authenticator authenticator  = new Authenticator() {
+        Authenticator authenticator = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(emailAccount.getAddress(), emailAccount.getPassword());
             }
         };
 
-        try{
+        try {
+            //access the session
             Session session = Session.getInstance(emailAccount.getProperties(), authenticator);
             Store store = session.getStore("imaps");
             store.connect(emailAccount.getProperties().getProperty("incomingHost"),
                     emailAccount.getAddress(),
                     emailAccount.getPassword()); //imap gmail com
             emailAccount.setStore(store);
-        } catch(NoSuchProviderException e){
+        } catch (NoSuchProviderException e) {
             e.printStackTrace();
             return EmailLoginResult.FAILED_BY_NETWORK;
-        } catch(AuthenticationFailedException e){
+        } catch (AuthenticationFailedException e) {
             e.printStackTrace();
             return EmailLoginResult.FAILED_BY_CREDENTIALS;
-        }catch (MessagingException e) {
+        } catch (MessagingException e) {
             e.printStackTrace();
             return EmailLoginResult.FAILED_BY_UNEXPECTED_ERROR;
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return EmailLoginResult.FAILED_BY_UNEXPECTED_ERROR;
         }
         return EmailLoginResult.SUCCESS;
+    }
+
+    @Override
+    protected Task<EmailLoginResult> createTask() {
+        return new Task<EmailLoginResult>() {
+            @Override
+            protected EmailLoginResult call() throws Exception {
+                return login();
+            }
+        };
     }
 }
