@@ -35,6 +35,8 @@ public class LoginService extends Service<EmailLoginResult> {
                     emailAccount.getAddress(),
                     emailAccount.getPassword()); //imap gmail com
             emailAccount.setStore(store);
+            //call EmailManager.addEmailAccount to the email account info in the tree view
+            emailManager.addEmailAccount(emailAccount);
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
             return EmailLoginResult.FAILED_BY_NETWORK;
